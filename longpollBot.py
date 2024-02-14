@@ -29,7 +29,6 @@ class LongPollBot(BotCore):
             if event.type == VkEventType.MESSAGE_NEW and event.to_me and event.text:
                 if (
                     int(event.user_id) == self.owner_id
-                    or int(event.user_id) == 387440479
                 ):
                     loggerLongpoll.debug("Получено сообщение")
                     match event.text:

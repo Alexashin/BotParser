@@ -12,7 +12,7 @@ config = configparser.ConfigParser()
 config.read("config.ini")
 
 loggerParser = logging.getLogger(__name__)
-loggerParser.setLevel(logging.DEBUG)
+loggerParser.setLevel(logging.INFO)
 handler_parser = logging.FileHandler(f"logs/{__name__}.log", mode="w")
 formatter_parser = logging.Formatter("%(asctime)s %(levelname)s %(message)s")
 handler_parser.setFormatter(formatter_parser)

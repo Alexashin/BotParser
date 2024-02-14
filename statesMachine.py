@@ -17,20 +17,13 @@ config.read("config.ini")
 # Машина состояний для бота Вконтакте с использованием sqlite3, где будет сохраняться id пользователя и его
 class StatesMachine:
     state = None
-    # states_dict = {
-    #     "start": [
-    #         "start",
-    #         "exit",
-    #     ],  # TODO: написать словарь с клавиатурами и генератор клавиатур
-    #     "ask_name": ["check_name", "ask_age"],
-    # }
 
     def __init__(self):
         loggerState.info("Машина состояний инициализируется")
         self.initCheck()
         self.state = self.getState()  # текущее состояние машины состояний
 
-    def initCheck(self):
+    def initCheck(self) -> None:
         if os.path.isfile("states/currentState.txt"):
             try:
                 with open("states/currentState.txt", "r") as file:
@@ -40,7 +33,7 @@ class StatesMachine:
                 loggerState.error(f"Ошибка при чтении файла состояния. Ошибка: {ex}")
         else:
             with open("states/currentState.txt", "w") as file:
-                file.write("start")  # TODO: сделать актуальные состояния
+                file.write("start")
 
     def getState(self) -> str:
         try:
