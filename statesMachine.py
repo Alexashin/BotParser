@@ -1,7 +1,8 @@
-import configparser
-import logging
-import os
+import configparser  # Импорт модуля для работы с конфигурационными файлами
+import logging  # Импортдуля для логирования
+import os  # Импортдуля для работы с операционной системой
 
+# Инициализация логгера
 loggerState = logging.getLogger(__name__)
 loggerState.setLevel(logging.INFO)
 handlerState = logging.FileHandler(f"logs/{__name__}.log", mode="w")
@@ -10,22 +11,25 @@ handlerState.setFormatter(formatterState)
 loggerState.addHandler(handlerState)
 
 
+# Чтение конфигурационного файла
 config = configparser.ConfigParser()
 config.read("config.ini")
 
 
-# Машина состояний для бота Вконтакте с использованием sqlite3, где будет сохраняться id пользователя и его
+# Класс Машина состояний для бота Вконтакте с использованием sqlite3, где будет сохраняться id пользователя и его
 class StatesMachine:
-    state = None
+    state = None  # Атрибут для хранения текущего состояния
 
     def __init__(self):
         loggerState.info("Машина состояний инициализируется")
         self.initCheck()
-        self.state = self.getState()  # текущее состояние машины состояний
+        self.state = self.getState()  # Установка текущего состояния
 
     def initCheck(self) -> None:
+        # Проверка на существование файла текущего состояния
         if os.path.isfile("states/currentState.txt"):
             try:
+                # Чтение текущего состояния из файла
                 with open("states/currentState.txt", "r") as file:
                     self.state = file.read().strip()
                 loggerState.info("Файл состояния загружен")

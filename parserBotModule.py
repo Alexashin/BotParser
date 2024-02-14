@@ -1,12 +1,11 @@
-import configparser
-import json
-import logging
-import os
-from threading import Timer, Thread
-import requests
-import time
-from longpollBot import LongPollBot
-
+import configparser  # Импорт модуля для работы с конфигурационными файлами
+import json  # Импорт модуля для работы с JSON данными
+import logging  # Импорт моля для логирования
+import os  # Импорт модуля для работы с операционной системой
+from threading import Timer, Thread  # Импорт модуля для работы с потоками
+import requests  # Импорт модуля для работы с HTTP запросами
+import time  # Импорт модуля для работы с временем
+from longpollBot import LongPollBot  # Импорт класса LongPollBot
 
 config = configparser.ConfigParser()
 config.read("config.ini")
@@ -29,7 +28,7 @@ class ParserBot(LongPollBot):
         Timer(60, self.sendNewParsedPosts).start()
 
     def sendNewParsedPosts(self) -> None:
-        groups = self.getGroupList()
+        groups = self.getGroupList
         if groups != []:
             for group in groups:
                 self.parsePosts(group)
@@ -38,7 +37,7 @@ class ParserBot(LongPollBot):
             loggerParser.info("Автоматический парсинг записей завершён")
 
     # Парсинг постов
-    def parsePosts(self, group_domen: str):
+    def parsePosts(self, group_domen: str) -> None:
         try:
             keywords = self.getKeywordList()
             url = f"https://api.vk.com/method/wall.get?domain={group_domen}&count=10&access_token={self.user_access_token}&v=5.199"
@@ -74,7 +73,10 @@ class ParserBot(LongPollBot):
             ):
                 loggerParser.info("Файла с ID постов не существует, создаём файл!")
 
-                with open(f"parserData/groups/{group_domen}/exist_posts_{group_domen}.txt", "w") as file:
+                with open(
+                    f"parserData/groups/{group_domen}/exist_posts_{group_domen}.txt",
+                    "w",
+                ) as file:
                     for item in fresh_posts_id:
                         file.write(str(item) + "\n")
                 for post in posts:
@@ -84,19 +86,25 @@ class ParserBot(LongPollBot):
                                 kw.lower() in post["text"].lower() for kw in keywords
                             ):
                                 self.sendPost(post, group_domen)
-                        else:
-                            self.sendPost(post, group_domen)
+                    else:
+                        self.sendPost(post, group_domen)
             else:  # перенести значения из exist в last
-                with open(f"parserData/groups/{group_domen}/last_posts_{group_domen}.txt", "w") as f_last:
+                with open(
+                    f"parserData/groups/{group_domen}/last_posts_{group_domen}.txt", "w"
+                ) as f_last:
                     with open(
-                        f"parserData/groups/{group_domen}/exist_posts_{group_domen}.txt", "r"
+                        f"parserData/groups/{group_domen}/exist_posts_{group_domen}.txt",
+                        "r",
                     ) as f_exist:
                         lines = f_exist.readlines()
                         last_ids = []
                         for line in lines:
                             last_ids.append(str(int(line.strip())))
                         f_last.writelines(lines)
-                with open(f"parserData/groups/{group_domen}/exist_posts_{group_domen}.txt", "w") as file:
+                with open(
+                    f"parserData/groups/{group_domen}/exist_posts_{group_domen}.txt",
+                    "w",
+                ) as file:
                     for item in fresh_posts_id:
                         file.write(str(item) + "\n")
                 for post in posts:
@@ -108,8 +116,8 @@ class ParserBot(LongPollBot):
                                 kw.lower() in post["text"].lower() for kw in keywords
                             ):
                                 self.sendPost(post, group_domen)
-                        else:
-                            self.sendPost(post, group_domen)
+                    else:
+                        self.sendPost(post, group_domen)
         except Exception as ex:
             loggerParser.error(f"Парсинг группы не выполнен. Ошибка: {ex}")
 

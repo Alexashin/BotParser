@@ -9,7 +9,10 @@ class KeyBoard:
         keyboard = VkKeyboard(one_time=one_time)  # Создание обычной клавиатуры
         for button in buttons:
             if len(button) == 2:
-                buttonName, color = button[0], button[1]  # Разделение названия кнопки и цвета на части
+                buttonName, color = (
+                    button[0],
+                    button[1],
+                )  # Разделение названия кнопки и цвета на части
                 keyboard.add_button(buttonName, color=color)
             else:
                 keyboard.add_line()  # Добавление перехода на новую строку в клавиатуре

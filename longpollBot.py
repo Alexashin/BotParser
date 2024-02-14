@@ -1,36 +1,42 @@
+# Импорт необходимых модулей
 import os
-from botCore import BotCore
+from botCore import BotCore  # Модуль с основными функциями бота
 import logging
-from vk_api.longpoll import VkLongPoll, VkEventType
-from kbGenerator import KeyBoard
-from keyboards.keyboards import kb
+from vk_api.longpoll import VkLongPoll, VkEventType  # Модуль для работы с Long Poll API
+from kbGenerator import KeyBoard  # Модуль для генерации клавиатур
+from keyboards.keyboards import kb  # Импортируем список доступных клавиатур
 
+# Инициализируем логгер для Long Poll
 loggerLongpoll = logging.getLogger(__name__)
 loggerLongpoll.setLevel(logging.INFO)
 handler_longpoll = logging.FileHandler(f"logs/{__name__}.log", mode="w")
 formatter_longpoll = logging.Formatter("%(asctime)s %(levelname)s %(message)s")
 handler_longpoll.setFormatter(formatter_longpoll)
 loggerLongpoll.addHandler(handler_longpoll)
+
+# Импортируем класс с машиной состояний
 from statesMachine import StatesMachine
 
 
+# Класс нашего бота, наследуем от класса BotCore
 class LongPollBot(BotCore):
-    long_poll = None
-    # Создание объекта машины состояний
-    states = StatesMachine()
+    long_poll = None  # Атрибут для long_poll
 
+    # Инициализация бота
     def __init__(self):
-        super().__init__()
+        super().__init__()  # Вызываем конструктор родителя
         loggerLongpoll.info("Longpoll бот инициализируется")
-        self.long_poll = VkLongPoll(self.vk_session)
+        self.long_poll = VkLongPoll(self.vk_session)  # Инициализируем long_poll
 
+    # Основной цикл long_poll
     def run_long_poll(self):
-        for event in self.long_poll.listen():
-            if event.type == VkEventType.MESSAGE_NEW and event.to_me and event.text:
-                if (
-                    int(event.user_id) == self.owner_id
-                ):
+        for event in self.long_poll.listen():  # Бесконечный цикл прослушивания событий
+            if (
+                event.type == VkEventType.MESSAGE_NEW and event.to_me and event.text
+            ):  # Фильтрация событий
+                if int(event.user_id) == self.owner_id:  # Фильтрация по id владельца
                     loggerLongpoll.debug("Получено сообщение")
+                    # Обработка введённого текста
                     match event.text:
                         case "Начать":
                             self.states.setState("start")
@@ -205,7 +211,7 @@ class LongPollBot(BotCore):
                                                 kb=KeyBoard.create(kb["control"]),
                                             )
 
-    # Получение списка групп
+    # Метод для получения списка групп
     def getGroupList(self) -> list:
         if os.path.isfile("parserData/groups.txt"):
             with open("parserData/groups.txt", "r") as file:
@@ -215,7 +221,7 @@ class LongPollBot(BotCore):
             groups = []
         return groups
 
-    # Добавление группы в список для парсинга
+    # Метод для добавления группы в список для парсинга
     def addGroupToList(self, group_domen: str) -> None:
         group_domen = group_domen.replace("\n", "").replace(" ", "")
         if os.path.isfile("parserData/groups.txt"):
@@ -227,7 +233,7 @@ class LongPollBot(BotCore):
                 file.write(f"{group_domen}\n")
                 file.close()
 
-    # Получение списка ключевых слов
+    # Метод для получения списка ключевых слов
     def getKeywordList(self) -> list:
         if os.path.isfile("parserData/keywords.txt"):
             with open("parserData/keywords.txt", "r") as file:
@@ -239,7 +245,7 @@ class LongPollBot(BotCore):
             keywords = []
         return keywords
 
-    # Добавление ключевого слова в список для парсинга
+    # Метод для добавления ключевого слова в список для парсинга
     def addKeywordToList(self, keyword: str) -> None:
         keyword = keyword.replace("\n", "")
         if os.path.isfile("parserData/keywords.txt"):
