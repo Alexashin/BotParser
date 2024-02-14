@@ -44,14 +44,16 @@ class ParserBot(LongPollBot):
             url = f"https://api.vk.com/method/wall.get?domain={group_domen}&count=10&access_token={self.user_access_token}&v=5.199"
             req = requests.get(url)
             src = req.json()
-            if os.path.exists(f"{group_domen}"):
+            if os.path.exists(f"parserData/groups/{group_domen}"):
                 loggerParser.debug(f"Директория с именем {group_domen} уже существует!")
             else:
-                os.mkdir(group_domen)
+                os.mkdir(f"parserData/groups/{group_domen}")
 
             # сохраняем данные в json файл, чтобы видеть структуру
             with open(
-                f"{group_domen}/{group_domen}.json", "w", encoding="utf-8"
+                f"parserData/groups/{group_domen}/{group_domen}.json",
+                "w",
+                encoding="utf-8",
             ) as file:
                 json.dump(src, file, indent=4, ensure_ascii=False)
 
@@ -67,10 +69,12 @@ class ParserBot(LongPollBot):
             # парсинг группы(отправляем все новые посты). Иначе начинаем
             # проверку и отправляем только новые посты.
 
-            if not os.path.exists(f"{group_domen}/exist_posts_{group_domen}.txt"):
+            if not os.path.exists(
+                f"parserData/groups/{group_domen}/exist_posts_{group_domen}.txt"
+            ):
                 loggerParser.info("Файла с ID постов не существует, создаём файл!")
 
-                with open(f"{group_domen}/exist_posts_{group_domen}.txt", "w") as file:
+                with open(f"parserData/groups/{group_domen}/exist_posts_{group_domen}.txt", "w") as file:
                     for item in fresh_posts_id:
                         file.write(str(item) + "\n")
                 for post in posts:
@@ -83,16 +87,16 @@ class ParserBot(LongPollBot):
                         else:
                             self.sendPost(post, group_domen)
             else:  # перенести значения из exist в last
-                with open(f"{group_domen}/last_posts_{group_domen}.txt", "w") as f_last:
+                with open(f"parserData/groups/{group_domen}/last_posts_{group_domen}.txt", "w") as f_last:
                     with open(
-                        f"{group_domen}/exist_posts_{group_domen}.txt", "r"
+                        f"parserData/groups/{group_domen}/exist_posts_{group_domen}.txt", "r"
                     ) as f_exist:
                         lines = f_exist.readlines()
                         last_ids = []
                         for line in lines:
                             last_ids.append(str(int(line.strip())))
                         f_last.writelines(lines)
-                with open(f"{group_domen}/exist_posts_{group_domen}.txt", "w") as file:
+                with open(f"parserData/groups/{group_domen}/exist_posts_{group_domen}.txt", "w") as file:
                     for item in fresh_posts_id:
                         file.write(str(item) + "\n")
                 for post in posts:
